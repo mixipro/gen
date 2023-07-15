@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 from flask import Flask, render_template, request, jsonify
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='static')
 
 # Load the data from files
 abund_file = '9606_abund.txt'

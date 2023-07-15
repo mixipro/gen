@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Gen</title>
+    <title>Gene</title>
     <style>
         body {
             background-color: #e0eaf5;
@@ -11,13 +11,20 @@
         }
 
         h1.stylish-header {
-            font-size: 48px;
+            font-size: 55px;
             font-weight: bold;
             color: #007bff;
-            text-transform: uppercase;
-            text-decoration: underline;
             letter-spacing: 2px;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            font-style: italic;
+        }
+
+        h1.stylish-header img {
+            width: 90px;
+            height: 120px;
+            margin-right: 15px;
         }
 
         .question-dropdown {
@@ -73,7 +80,7 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>
-    <h1 class="stylish-header">GEN</h1>
+    <h1 class="stylish-header"><img src="{{ url_for('static', filename='gene.png') }}" alt="Gene Icon">Gene</h1>
 
     <select id="question-dropdown" class="question-dropdown">
         <option value="A1">A1. How many unique gene/copy-number values are in the file?</option>
