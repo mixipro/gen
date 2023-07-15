@@ -115,6 +115,9 @@
                 var resultContainer = $('#result-container');
                 resultContainer.empty();
 
+                var domainStatsContainer = $('#domain-stats-container');
+                domainStatsContainer.empty();
+
                 if ('answer' in response) {
                     resultContainer.append('<p>Answer: ' + response.answer + '</p>');
                 }
@@ -143,9 +146,6 @@
                 }
 
                 if ('result' in response) {
-                    var domainStatsContainer = $('#domain-stats-container');
-                    domainStatsContainer.empty();
-
                     var domainStatsHtml = '<table><thead><tr><th>Gn</th><th>Domain</th><th>Mean</th><th>Std</th></tr></thead><tbody>';
 
                     for (var j = 0; j < response.result.length; j++) {

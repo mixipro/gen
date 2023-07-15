@@ -21,12 +21,13 @@ def calculate_unique_values(df):
 
 def calculate_mean_std(df):
     if 'std' not in df.columns:
-        df['std'] = "none"  # Add a new 'std' column filled with "none"
-    else:
-        df['std'] = df['std'].fillna(df['std'].mean())
+        df['std'] = np.nan  # Add a new 'std' column filled with NaN
 
     df['Mean-copy-number'] = pd.to_numeric(df['Mean-copy-number'], errors='coerce')
-    df = df.dropna(subset=['Mean-copy-number'])
+    df['std'] = pd.to_numeric(df['std'], errors='coerce')
+
+    df.loc[df['std'].isnull(), 'std'] = df['Mean-copy-number'].mean()
+    df.dropna(subset=['Mean-copy-number'], inplace=True)
 
     result = df[['Taxid', 'Ensembl_protein', 'Gn', 'Mean-copy-number']].to_dict(orient='records')
     return {'results': result}
@@ -55,26 +56,28 @@ def calculate_domain_mean_std(df):
 
     # Check if 'std' column is present in the DataFrame
     if 'std' not in df.columns:
-        df['std'] = "none"  # Add a new 'std' column filled with "none"
-    else:
-        df['std'] = pd.to_numeric(df['std'], errors='coerce')
-        df['std'] = df['std'].fillna("none")
+        df['std'] = np.nan  # Add a new 'std' column filled with NaN
 
-    # Replace NaN values in 'Mean-copy-number' column with 0
-    df['Mean-copy-number'] = df['Mean-copy-number'].fillna(0)
+    # Replace 'none' values in 'Mean-copy-number' column with NaN
+    df.loc[df['Mean-copy-number'] == 'none', 'Mean-copy-number'] = np.nan
 
     # Remove rows with missing 'Mean-copy-number' values
-    df = df.dropna(subset=['Mean-copy-number'])
+    df.dropna(subset=['Mean-copy-number'], inplace=True)
+
+    # Replace 'none' values in 'std' column with NaN
+    df.loc[df['std'] == 'none', 'std'] = np.nan
+
+    # Convert 'std' column to numeric
+    df['std'] = pd.to_numeric(df['std'], errors='coerce')
+
+    # Replace NaN values in 'std' column with the mean of 'Mean-copy-number' column
+    df['std'].fillna(df['Mean-copy-number'].mean(), inplace=True)
 
     # Calculate domain statistics
     domain_stats = df.groupby(['Gn', 'Domain'])['Mean-copy-number'].agg(mean='mean', std='first').reset_index()
-    domain_stats['std'] = np.where(domain_stats['std'] == "none", df['Mean-copy-number'].mean(), domain_stats['std'])
 
     result = domain_stats.to_dict(orient='records')
     return {'result': result}
-
-
-
 
 def format_json_response(data):
     response = jsonify(data)
