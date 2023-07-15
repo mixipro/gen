@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Gen</title>
+    <style>
+        body {
+            background-color: #e0eaf5;
+            font-family: Arial, sans-serif;
+            color: #333;
+            padding: 20px;
+        }
+
+        h1.stylish-header {
+            font-size: 48px;
+            font-weight: bold;
+            color: #007bff;
+            text-transform: uppercase;
+            text-decoration: underline;
+            letter-spacing: 2px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .question-dropdown {
+            margin-bottom: 20px;
+            background-color: #fff;
+            color: #333;
+            border: none;
+            border-radius: 5px;
+            padding: 10px;
+            font-size: 16px;
+        }
+
+        .question-button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            padding: 10px;
+            border: 1px solid #ccc;
+            text-align: left;
+        }
+
+        th {
+            background-color: #d2e3f8;
+            color: #007bff;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f5f9ff;
+        }
+
+        #result-container {
+            margin-top: 20px;
+        }
+
+        #domain-stats-container {
+            margin-top: 20px;
+        }
+    </style>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <h1 class="stylish-header">GEN</h1>
+
+    <select id="question-dropdown" class="question-dropdown">
+        <option value="A1">A1. How many unique gene/copy-number values are in the file?</option>
+        <option value="A2">A2. Compute the mean and standard deviation of copy number for all unique human gene products/proteins</option>
+        <option value="A3">A3. Calculate the percentile rank for each gene product/protein</option>
+        <option value="B1">B1. What is the domain with the highest average abundance?</option>
+        <option value="B2">B2. Compute the mean and standard deviation of domain average abundance for each protein</option>
+    </select>
+
+    <button id="calculate-button" class="question-button">Calculate</button>
+
+    <div id="result-container"></div>
+
+    <div id="domain-stats-container"></div>
+
+    <script>
+        $(document).ready(function () {
+            $('#calculate-button').click(function () {
+                var question = $('#question-dropdown').val();
+
+                $.ajax({
+                    type: 'POST',
+                    url: '/calculate',
+                    data: { 'question': question },
+                    success: function (response) {
+                        showResult(response);
+                    }
+                });
+            });
+
+            function showResult(response) {
+                var resultContainer = $('#result-container');
+                resultContainer.empty();
+
+                if ('answer' in response) {
+                    resultContainer.append('<p>Answer: ' + response.answer + '</p>');
+                }
+
+                if ('results' in response) {
+                    var tableHtml = '<table><thead><tr><th>Taxid</th><th>Ensembl_protein</th><th>Gn</th><th>Mean-copy-number</th></tr></thead><tbody>';
+
+                    for (var i = 0; i < response.results.length; i++) {
+                        var row = response.results[i];
+                        tableHtml += '<tr><td>' + row.Taxid + '</td><td>' + row.Ensembl_protein + '</td><td>' + row.Gn + '</td><td>' + row['Mean-copy-number'] + '</td></tr>';
+                    }
+
+                    tableHtml += '</tbody></table>';
+                    resultContainer.append(tableHtml);
+                }
+
+                if ('percentiles' in response) {
+                    var percentilesHtml = '<table><thead><tr><th>Gene</th><th>Percentile Rank</th></tr></thead><tbody>';
+
+                    for (var gene in response.percentiles) {
+                        percentilesHtml += '<tr><td>' + gene + '</td><td>' + response.percentiles[gene] + '</td></tr>';
+                    }
+
+                    percentilesHtml += '</tbody></table>';
+                    resultContainer.append(percentilesHtml);
+                }
+
+                if ('result' in response) {
+                    var domainStatsContainer = $('#domain-stats-container');
+                    domainStatsContainer.empty();
+
+                    var domainStatsHtml = '<table><thead><tr><th>Gn</th><th>Domain</th><th>Mean</th><th>Std</th></tr></thead><tbody>';
+
+                    for (var j = 0; j < response.result.length; j++) {
+                        var domainRow = response.result[j];
+                        domainStatsHtml += '<tr><td>' + domainRow.Gn + '</td><td>' + domainRow.Domain + '</td><td>' + domainRow.mean + '</td><td>' + domainRow.std + '</td></tr>';
+                    }
+
+                    domainStatsHtml += '</tbody></table>';
+                    domainStatsContainer.append(domainStatsHtml);
+                }
+            }
+        });
+    </script>
+</body>
+</html>
