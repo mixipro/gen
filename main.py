@@ -36,7 +36,10 @@ def calculate_percentiles(df):
     df = df.dropna(subset=['Mean-copy-number'])
 
     percentiles = df.groupby('Gn')['Mean-copy-number'].rank(pct=True) * 100
-    return {'percentiles': percentiles.to_dict()}
+    percentiles_df = pd.DataFrame({'Gn': df['Gn'], 'Percentile Rank': percentiles})
+    result = percentiles_df.to_dict(orient='records')
+    #print(result)
+    return {'percentiles': result}
 
 
 def calculate_max_domain(df):

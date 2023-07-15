@@ -77,7 +77,6 @@
             margin-top: 20px;
         }
 
-
     </style>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
@@ -100,69 +99,76 @@
 
 <div id="domain-stats-container"></div>
 
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-        $(document).ready(function () {
-            $('#calculate-button').click(function () {
-                var question = $('#question-dropdown').val();
+    $(document).ready(function () {
+      $('#calculate-button').click(function () {
+        var question = $('#question-dropdown').val();
 
-                $.ajax({
-                    type: 'POST',
-                    url: '/calculate',
-                    data: { 'question': question },
-                    success: function (response) {
-                        showResult(response);
-                    }
-                });
-            });
-
-            function showResult(response) {
-                var resultContainer = $('#result-container');
-                resultContainer.empty();
-
-                var domainStatsContainer = $('#domain-stats-container');
-                domainStatsContainer.empty();
-
-                if ('answer' in response) {
-                    resultContainer.append('<p>Answer: ' + response.answer + '</p>');
-                }
-
-                if ('results' in response) {
-                    var tableHtml = '<table><thead><tr><th>Taxid</th><th>Ensembl_protein</th><th>Gn</th><th>Mean-copy-number</th></tr></thead><tbody>';
-
-                    for (var i = 0; i < response.results.length; i++) {
-                        var row = response.results[i];
-                        tableHtml += '<tr><td>' + row.Taxid + '</td><td>' + row.Ensembl_protein + '</td><td>' + row.Gn + '</td><td>' + row['Mean-copy-number'] + '</td></tr>';
-                    }
-
-                    tableHtml += '</tbody></table>';
-                    resultContainer.append(tableHtml);
-                }
-
-                if ('percentiles' in response) {
-                    var percentilesHtml = '<table><thead><tr><th>Gene</th><th>Percentile Rank</th></tr></thead><tbody>';
-
-                    for (var gene in response.percentiles) {
-                        percentilesHtml += '<tr><td>' + gene + '</td><td>' + response.percentiles[gene] + '</td></tr>';
-                    }
-
-                    percentilesHtml += '</tbody></table>';
-                    resultContainer.append(percentilesHtml);
-                }
-
-                if ('result' in response) {
-                    var domainStatsHtml = '<table><thead><tr><th>Gn</th><th>Domain</th><th>Mean</th><th>Std</th></tr></thead><tbody>';
-
-                    for (var j = 0; j < response.result.length; j++) {
-                        var domainRow = response.result[j];
-                        domainStatsHtml += '<tr><td>' + domainRow.Gn + '</td><td>' + domainRow.Domain + '</td><td>' + domainRow.mean + '</td><td>' + domainRow.std + '</td></tr>';
-                    }
-
-                    domainStatsHtml += '</tbody></table>';
-                    domainStatsContainer.append(domainStatsHtml);
-                }
-            }
+        $.ajax({
+          type: 'POST',
+          url: '/calculate',
+          data: { 'question': question },
+          success: function (response) {
+            showResult(response);
+          }
         });
+      });
 
+      function showResult(response) {
+        var resultContainer = $('#result-container');
+        resultContainer.empty();
+
+        var domainStatsContainer = $('#domain-stats-container');
+        domainStatsContainer.empty();
+
+        if ('answer' in response) {
+          resultContainer.append('<p>Answer: ' + response.answer + '</p>');
+        }
+
+        if ('results' in response) {
+          var tableHtml = '<table><thead><tr><th>Taxid</th><th>Ensembl_protein</th><th>Gn</th><th>Mean-copy-number</th></tr></thead><tbody>';
+
+          for (var i = 0; i < response.results.length; i++) {
+            var row = response.results[i];
+            tableHtml += '<tr><td>' + row.Taxid + '</td><td>' + row.Ensembl_protein + '</td><td>' + row.Gn + '</td><td>' + row['Mean-copy-number'] + '</td></tr>';
+          }
+
+          tableHtml += '</tbody></table>';
+          resultContainer.append(tableHtml);
+        }
+
+        if ('percentiles' in response) {
+          var percentilesHtml = '<table><thead><tr><th>Gn</th><th>Percentile Rank</th></tr></thead><tbody>';
+
+          for (var j = 0; j < response.percentiles.length; j++) {
+            var percentile = response.percentiles[j];
+            percentilesHtml += '<tr><td>' + percentile.Gn + '</td><td>' + percentile['Percentile Rank'] + '</td></tr>';
+          }
+
+          percentilesHtml += '</tbody></table>';
+          if ($('#question-dropdown').val() === 'A3') {
+            resultContainer.append(percentilesHtml);
+          }
+        }
+
+        if ('result' in response) {
+          var domainStatsHtml = '<table><thead><tr><th>Gn</th><th>Domain</th><th>Mean</th><th>Std</th></tr></thead><tbody>';
+
+          for (var k = 0; k < response.result.length; k++) {
+            var domainRow = response.result[k];
+            domainStatsHtml += '<tr><td>' + domainRow.Gn + '</td><td>' + domainRow.Domain + '</td><td>' + domainRow.mean + '</td><td>' + domainRow.std + '</td></tr>';
+          }
+
+          domainStatsHtml += '</tbody></table>';
+          if ($('#question-dropdown').val() === 'B2') {
+            resultContainer.append(domainStatsHtml);
+          } else {
+            domainStatsContainer.append(domainStatsHtml);
+          }
+        }
+      }
+    });
 
 </script>
 </body>
