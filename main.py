@@ -4,11 +4,9 @@ from flask import Flask, render_template, request, jsonify
 
 app = Flask(__name__, static_folder='static')
 
-# Load the data from files
 abund_file = '9606_abund.txt'
 domain_file = '9606_gn_dom.txt'
 
-# Convert abund_file to CSV
 abund_df = pd.read_csv(abund_file, delimiter='\t')
 domain_df = pd.read_csv(domain_file, delimiter='\t')
 
@@ -21,7 +19,7 @@ def calculate_unique_values(df):
 
 def calculate_mean_std(df):
     if 'std' not in df.columns:
-        df['std'] = np.nan  # Add a new 'std' column filled with NaN
+        df['std'] = np.nan
 
     df['Mean-copy-number'] = pd.to_numeric(df['Mean-copy-number'], errors='coerce')
     df['std'] = pd.to_numeric(df['std'], errors='coerce')
@@ -51,33 +49,26 @@ def calculate_max_domain(df):
 
 
 def calculate_domain_mean_std(df):
-    # Convert 'Mean-copy-number' column to numeric
     df['Mean-copy-number'] = pd.to_numeric(df['Mean-copy-number'], errors='coerce')
 
-    # Check if 'std' column is present in the DataFrame
     if 'std' not in df.columns:
-        df['std'] = np.nan  # Add a new 'std' column filled with NaN
+        df['std'] = np.nan
 
-    # Replace 'none' values in 'Mean-copy-number' column with NaN
     df.loc[df['Mean-copy-number'] == 'none', 'Mean-copy-number'] = np.nan
 
-    # Remove rows with missing 'Mean-copy-number' values
     df.dropna(subset=['Mean-copy-number'], inplace=True)
 
-    # Replace 'none' values in 'std' column with NaN
     df.loc[df['std'] == 'none', 'std'] = np.nan
 
-    # Convert 'std' column to numeric
     df['std'] = pd.to_numeric(df['std'], errors='coerce')
 
-    # Replace NaN values in 'std' column with the mean of 'Mean-copy-number' column
     df['std'].fillna(df['Mean-copy-number'].mean(), inplace=True)
 
-    # Calculate domain statistics
     domain_stats = df.groupby(['Gn', 'Domain'])['Mean-copy-number'].agg(mean='mean', std='first').reset_index()
 
     result = domain_stats.to_dict(orient='records')
     return {'result': result}
+
 
 def format_json_response(data):
     response = jsonify(data)

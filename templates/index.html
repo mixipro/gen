@@ -76,27 +76,31 @@
         #domain-stats-container {
             margin-top: 20px;
         }
+
+
     </style>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>
-    <h1 class="stylish-header"><img src="{{ url_for('static', filename='gene.png') }}" alt="Gene Icon">Gene</h1>
+<h1 class="stylish-header"><img src="{{ url_for('static', filename='gene.png') }}" alt="Gene Icon">Gene</h1>
 
-    <select id="question-dropdown" class="question-dropdown">
-        <option value="A1">A1. How many unique gene/copy-number values are in the file?</option>
-        <option value="A2">A2. Compute the mean and standard deviation of copy number for all unique human gene products/proteins</option>
-        <option value="A3">A3. Calculate the percentile rank for each gene product/protein</option>
-        <option value="B1">B1. What is the domain with the highest average abundance?</option>
-        <option value="B2">B2. Compute the mean and standard deviation of domain average abundance for each protein</option>
-    </select>
+<select id="question-dropdown" class="question-dropdown">
+    <option value="A1">A1. How many unique gene/copy-number values are in the file?</option>
+    <option value="A2">A2. Compute the mean and standard deviation of copy number for all unique human gene
+        products/proteins
+    </option>
+    <option value="A3">A3. Calculate the percentile rank for each gene product/protein</option>
+    <option value="B1">B1. What is the domain with the highest average abundance?</option>
+    <option value="B2">B2. Compute the mean and standard deviation of domain average abundance for each protein</option>
+</select>
 
-    <button id="calculate-button" class="question-button">Calculate</button>
+<button id="calculate-button" class="question-button">Calculate</button>
 
-    <div id="result-container"></div>
+<div id="result-container"></div>
 
-    <div id="domain-stats-container"></div>
+<div id="domain-stats-container"></div>
 
-    <script>
+<script>
         $(document).ready(function () {
             $('#calculate-button').click(function () {
                 var question = $('#question-dropdown').val();
@@ -158,6 +162,8 @@
                 }
             }
         });
-    </script>
+
+
+</script>
 </body>
 </html>
